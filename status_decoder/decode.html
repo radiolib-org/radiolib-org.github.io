@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RadioLib Status Code Decoder</title>
+  <link rel="icon" type="image/x-icon" href="https://avatars.githubusercontent.com/u/162502884">
+  <link rel="stylesheet" href="../github-markdown-css/github-markdown.css">
+  <style>
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 45px;
+    }
+
+    @media (max-width: 767px) {
+      .markdown-body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body class="markdown-body">
+  <h1>RadioLib Status Code Decoder</h1>
+  <p>
+    All RadioLib status codes can be found <a href="https://jgromes.github.io/RadioLib/group__status__codes.html">here.</a>
+    This decoder pulls data directly from that page, which is built automatically from <a href="https://github.com/jgromes/RadioLib/blob/master/src/TypeDef.h">RadioLib source.</a>
+    We also have a <a href="https://github.com/jgromes/RadioLib/wiki/Troubleshooting-Guide">Troubleshooting Guide</a> for most common problems.</p>
+  </p>
+  <p>Enter RadioLib status code value (a negative integer) and click "Decode" to see the result below.</p>
+
+  <form id="statusForm">
+    <label for="statusValue">Status Code:</label>
+    <input type="text" id="statusValue" name="statusValue" required>
+    <button type="submit">Decode</button>
+  </form>
+
+  <h2>Result</h2>
+  <pre><code><p id="result"></p></code></pre>
+
+  <script>
+    function getMacroVal(element) {
+      // Get the text content of the element
+      const text = element.textContent;
+
+      // Use a regular expression to match the number in parentheses
+      const match = text.match(/\((-?\d+)\)/);
+
+      // If a match is found, return the captured number, otherwise return null
+      return match ? parseInt(match[1], 10) : null;
+    }
+
+    async function decodeStatus(inputValue) {
+      const url = 'https://jgromes.github.io/RadioLib/group__status__codes.html';
+
+      try {
+          // Fetch the HTML content from the URL
+          const response = await fetch(url);
+
+          // Check if the response is successful
+          if (!response.ok) {
+              throw new Error(response.status);
+          }
+
+          // Retrieve the HTML text
+          const htmlText = await response.text();
+
+          // Parse the HTML text into a DOM document
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+
+          // Find all macro definitions (adjust selector if necessary)
+          const macros = doc.querySelectorAll('.memItemRight');
+
+          // Loop through macros and check if any match the input value
+          for (let macro of macros) {
+              // Assuming the macro name is within a certain tag (e.g., `.memname`)
+              const macroNameElement = macro.querySelector('.el');
+
+              if (macroNameElement) {
+                  const macroName = macroNameElement.textContent.trim();
+                  const statusValue = getMacroVal(macro)
+
+                  // Check if the description contains the input value
+                  if (statusValue == inputValue) {
+                    const macroId = macro.parentElement.className.match(/memitem:(\S+)/)[1];
+                    const descriptionElement = doc.querySelector(`.memdesc\\:${macroId} .mdescRight`);
+
+                    if (descriptionElement) {
+                        const description = descriptionElement.textContent.trim();
+                        return { macroName, description }; // Return both macro name and description
+                    }
+                  }
+              }
+          }
+
+          // If no match is found
+          macroName = "No status code found for value:";
+          description = inputValue;
+          return { macroName, description };
+      } catch (error) {
+          macroName = "Error fetching or parsing the HTML:";
+          description = error;
+          return { macroName, description };
+      }
+    }
+
+
+    // Handle form submission
+    document.getElementById("statusForm").addEventListener("submit", async function(event) {
+      event.preventDefault(); // Prevent the form from submitting traditionally
+
+      const inputValue = document.getElementById("statusValue").value;
+      const resultElement = document.getElementById("result");
+
+      // Fetch the macro name based on input value
+      resultElement.textContent = "Searching..."; // Show a loading message
+      const result = await decodeStatus(inputValue);
+
+      // Display the result
+      if (typeof result === "object") {
+        resultElement.innerHTML = `${result.macroName}\n${result.description}`;
+      } else {
+        resultElement.innerHTML = `Status code not found!`
+      }
+    });
+  </script>
+</body>
+</html>
