@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>radiolib-org.github.io</title>
+  <title>RadioLib Debug Decoder</title>
   <link rel="icon" type="image/x-icon" href="https://avatars.githubusercontent.com/u/162502884">
   <link rel="stylesheet" href="../github-markdown-css/github-markdown.css">
   <style>
@@ -23,12 +23,17 @@
   </style>
 </head>
 <body class="markdown-body">
-  <h1>radiolib-org.github.io</h1>
-  <h2>Quick Links</h2>
-  <ul>
-    <li><a href="https://radiolib-org.github.io/RadioLib/index.html">RadioLib Documentation</a></li>
-    <li><a href="https://radiolib-org.github.io/status_decoder/decode.html">RadioLib Status Code Decoder</a></li>
-    <li><a href="https://radiolib-org.github.io/debug_decoder/decode.html">RadioLib Debug Decoder</a></li>
-  </ul>
+  <h1>RadioLib Debug Decoder</h1>
+  <p>Enter RadioLib debug log and click "Decode" to see the result below.</p>
+
+  <form id="debugForm">
+    <textarea id="debugInput" rows="10" cols="115" placeholder="Paste your debug log here"></textarea><br>
+    <button type="submit">Decode</button>
+  </form>
+
+  <h2>Result</h2>
+  <pre><code><p id="output"></p></code></pre>
+
+  <script src="decode.js"></script>
 </body>
 </html>
