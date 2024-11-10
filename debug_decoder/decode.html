@@ -23,7 +23,11 @@
   </style>
 </head>
 <body class="markdown-body">
-  <h1>RadioLib Debug Decoder</h1>
+  <p>
+    This page decodes RadioLib debug logs into readable text. This is mainly useful for SPI debug level (enabled with <code>RADIOLIB_DEBUG_SPI</code>), which contains all SPI transactions.
+    See <a href="https://github.com/jgromes/RadioLib/wiki/Debug-mode">RadioLib Wiki</a> for details on how to enable debug mode and all its levels.
+    The decoder will take the input and replace the addresses of SPI registers with macro names defined in RadioLib source files.
+  </p>
   <p>Enter RadioLib debug log and click "Decode" to see the result below.</p>
 
   <form id="debugForm">
