@@ -64,12 +64,31 @@ function getMacroVal(element) {
   return match ? parseInt(match[1], 10) : null;
 }
 
+// Prefill form using hash value in the URL
+function prefillFormFromHash() {
+  const hash = location.hash;
+  if (hash.startsWith("#statusValue=")) {
+      const inputValue = parseInt(hash.split("=")[1], 10);
+      const inputField = document.getElementById("statusValue");
+
+      if (!isNaN(inputValue)) {
+          inputField.value = inputValue;
+
+          // Trigger search automatically
+          document.getElementById("statusForm").dispatchEvent(new Event("submit"));
+      }
+  }
+}
+
 // Handle form submission
 document.getElementById("statusForm").addEventListener("submit", async function(event) {
   event.preventDefault(); // Prevent the form from submitting traditionally
 
   const inputValue = document.getElementById("statusValue").value;
   const resultElement = document.getElementById("result");
+
+  // Add the input value to the URL as a hashtag
+  location.hash = `#statusValue=${inputValue}`;
 
   // Fetch the macro name based on input value
   resultElement.textContent = "Searching..."; // Show a loading message
@@ -82,3 +101,6 @@ document.getElementById("statusForm").addEventListener("submit", async function(
     resultElement.innerHTML = `Status code not found!`
   }
 });
+
+// Run prefill logic on page load
+document.addEventListener("DOMContentLoaded", prefillFormFromHash);
