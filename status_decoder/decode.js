@@ -23,7 +23,7 @@ async function decodeStatus(inputValue) {
       // Loop through macros and check if any match the input value
       for (let macro of macros) {
           // Assuming the macro name is within a certain tag (e.g., `.memname`)
-          const macroNameElement = macro.querySelector('.el');
+          const macroNameElement = macro.querySelector('b');
 
           if (macroNameElement) {
               const macroName = macroNameElement.textContent.trim();
