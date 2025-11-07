@@ -34,6 +34,13 @@
 
   <form id="debugForm">
     <textarea id="debugInput" rows="10" cols="115" placeholder="Paste your debug log here"></textarea><br>
+    Select the version of the library you are running<br>
+    <input type="radio" id="refMaster" name="ref" checked="checked">
+    <label for="html">HEAD commit of the master branch</label><br>
+    <input type="radio" id="refTag" name="ref">
+    <label for="html">Specific tag or release: </label><input type="text" id="tag" size="16"><br>
+    <input type="radio" id="refCommit" name="ref">
+    <label for="css">Specific commit hash: </label><input type="text" id="commit" size="40"><br>
     <button type="submit">Decode</button>
   </form>
 

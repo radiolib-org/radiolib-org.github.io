@@ -46,6 +46,13 @@ document.getElementById("debugForm").addEventListener("submit", async function(e
 
   // Get the input text from the textarea
   logText = document.getElementById('debugInput').value;
+
+  // get the ref type
+  const isMaster = document.getElementById('refMaster').checked;
+  const isTag = document.getElementById('refTag').checked;
+  ref = document.getElementById('commit').value;
+  console.log(isMaster)
+  console.log(isTag)
       
   // find the modules in use
   modules = findByMarker(logText, "RLB_DBG:\\sM\\s");
@@ -56,7 +63,14 @@ document.getElementById("debugForm").addEventListener("submit", async function(e
   isStreamType = regex.test(baseModule);
 
   // get the appropriate header files
-  const urlBase = 'https://raw.githubusercontent.com/jgromes/RadioLib/refs/heads/master/src/modules/';
+  if (isMaster) {
+    ref = 'refs/heads/master';
+  } else if (isTag) {
+    ref = 'refs/tags/' + document.getElementById('tag').value;
+  }
+  const urlBase = 'https://raw.githubusercontent.com/jgromes/RadioLib/' + ref + '/src/modules/';
+  console.log(urlBase)
+  
   for (let module of modules) {
     try {
       // Fetch the HTML content from the URL
