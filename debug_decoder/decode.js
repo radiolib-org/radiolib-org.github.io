@@ -40,6 +40,45 @@ function parseMacroNames(text, pattern) {
   return result;
 }
 
+async function getHeaderUrls(base, modules) {
+  headers = []
+  for (let module of modules) {
+    // if this file is not yet in the headers, add it
+    if(!headers.includes(base + modules[0] + '/' + module + '.h')) {
+      headers.push(base + modules[0] + '/' + module +  '.h')
+    }
+
+    try {
+      // fetch the HTML content from the URL
+      const response = await fetch(base + modules[0] + '/' + module + '.h');
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+
+      // retrieve the header contents
+      const headerText = await response.text();
+
+      // find if there are further included header files
+      const matches = headerText.matchAll(RegExp("#include \"SX126x_(.*).h\"", "g"));
+      for (const match of matches) {
+        const filename = base + modules[0] + '/' + modules[0] + '_' + match[1] + '.h'
+        if(!headers.includes(filename)) {
+          headers.push(filename)
+        }
+      }
+
+    } catch (error) {
+      console.log(error)
+    
+    }
+  }
+
+  console.log(headers)
+  return headers
+}
+
 // Handle form submission
 document.getElementById("debugForm").addEventListener("submit", async function(event) {
   event.preventDefault(); // Prevent the form from submitting traditionally
@@ -51,8 +90,6 @@ document.getElementById("debugForm").addEventListener("submit", async function(e
   const isMaster = document.getElementById('refMaster').checked;
   const isTag = document.getElementById('refTag').checked;
   ref = document.getElementById('commit').value;
-  console.log(isMaster)
-  console.log(isTag)
       
   // find the modules in use
   modules = findByMarker(logText, "RLB_DBG:\\sM\\s");
@@ -69,12 +106,12 @@ document.getElementById("debugForm").addEventListener("submit", async function(e
     ref = 'refs/tags/' + document.getElementById('tag').value;
   }
   const urlBase = 'https://raw.githubusercontent.com/jgromes/RadioLib/' + ref + '/src/modules/';
-  console.log(urlBase)
   
-  for (let module of modules) {
+  const headers = await getHeaderUrls(urlBase, modules);
+  for (let header of headers) {
     try {
       // Fetch the HTML content from the URL
-      const response = await fetch(urlBase + baseModule + '/' + module + '.h');
+      const response = await fetch(header);
 
       // Check if the response is successful
       if (!response.ok) {
